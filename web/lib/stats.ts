@@ -10,14 +10,14 @@ export type VolumeBucket = {
   tokenId: string;
 };
 
-type PaidVolumeResult = {
-  granularity: VolumeGranularity;
+type PaidVolumeResult<G extends VolumeGranularity = VolumeGranularity> = {
+  granularity: G;
   buckets: VolumeBucket[];
 };
 
 function bucketStart(date: Date, granularity: VolumeGranularity): Date {
   const start = new Date(
-    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
   );
   if (granularity === "week") {
     const dayOfWeek = (start.getUTCDay() + 6) % 7; // Monday = 0
@@ -29,10 +29,10 @@ function bucketStart(date: Date, granularity: VolumeGranularity): Date {
   return start;
 }
 
-function bucketPaidVolume(
+function bucketPaidVolume<G extends VolumeGranularity>(
   paidInvoices: Invoice[],
-  granularity: VolumeGranularity
-): PaidVolumeResult {
+  granularity: G,
+): PaidVolumeResult<G> {
   const withDates = paidInvoices.filter((i) => i.paidAt > 0n);
   if (withDates.length === 0) return { granularity, buckets: [] };
 
@@ -101,7 +101,7 @@ export function bucketMonthlyIncome(paidInvoices: Invoice[]): {
  * without both timestamps (or with a negative interval) are ignored.
  */
 export function averageTimeToPayDays(
-  invoices: Pick<Invoice, "status" | "createdAt" | "paidAt">[]
+  invoices: Pick<Invoice, "status" | "createdAt" | "paidAt">[],
 ): number | null {
   let totalSeconds = 0;
   let count = 0;
@@ -122,14 +122,14 @@ export function averageTimeToPayDays(
 /** Overdue invoice amounts grouped by token; different tokens are never summed. */
 export function overdueTotalsByToken(
   invoices: Pick<Invoice, "status" | "dueDate" | "amount" | "token">[],
-  nowMs: number = Date.now()
+  nowMs: number = Date.now(),
 ): Map<string, bigint> {
   const totals = new Map<string, bigint>();
   for (const invoice of invoices) {
     if (!isOverdue(invoice, nowMs)) continue;
     totals.set(
       invoice.token,
-      (totals.get(invoice.token) ?? 0n) + invoice.amount
+      (totals.get(invoice.token) ?? 0n) + invoice.amount,
     );
   }
   return totals;

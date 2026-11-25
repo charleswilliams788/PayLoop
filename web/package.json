@@ -6,10 +6,10 @@
     "node": "22.x"
   },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node init && next dev",
+    "build": "node init && next build",
     "analyze": "ANALYZE=true next build",
-    "start": "next start",
+    "start": "node init && next start",
     "lint": "next lint",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

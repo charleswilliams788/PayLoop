@@ -22,5 +22,4 @@ export default sentryEnabled
       silent: !process.env.CI,
       widenClientFileUpload: true,
       disableLogger: true,
-    })
-  : nextConfig;
+    });

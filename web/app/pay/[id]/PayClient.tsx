@@ -271,7 +271,7 @@ export default function PayClient({ id }: { id: string }) {
                       "reminder",
                       buildReminderMessage({
                         id: invoice.id,
-                        amountLabel: `${formatAmount(invoice.amount)} ${config.tokenSymbol}`,
+                        amountLabel: `${formatAmount(invoice.amount, token.decimals)} ${token.symbol}`,
                         description: humanizeDescription(invoice.description),
                         url: payUrl,
                       }),
